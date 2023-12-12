@@ -1,7 +1,7 @@
 pipeline{
     agent any
     environment{
-        SONAR_HOME= tool "Sonar"
+        SONAR_HOME= tool "sonar-scanner"
     }
     stages{
         stage("Code Checkout"){
@@ -12,7 +12,7 @@ pipeline{
         
         stage("SonarQube Analysis"){
             steps{
-                withSonarQubeEnv("sonar-cred"){
+                withSonarQubeEnv("Sonar-token"){
                     sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
                 }
             }
@@ -46,15 +46,15 @@ pipeline{
         }
         stage('Build and Push Docker Image') {
       environment {
-        DOCKER_IMAGE = "abhishekf5/nodeapp:latest"
+        DOCKER_IMAGE = "rajesh4851/nodeapp:latest"
         // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
         REGISTRY_CREDENTIALS = credentials('docker-cred')
       }
       steps {
         script {
-            sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
+            sh 'docker build -t ${DOCKER_IMAGE} .'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
+            docker.withRegistry('https://docker.io', "docker-cred") {
                 dockerImage.push()
             }
         }
