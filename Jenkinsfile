@@ -9,11 +9,7 @@ pipeline{
                 git url:"https://github.com/rajeshmamuddu/Nodetodo-CI-CD-list.git", branch:"main"
             }
         }
-        
       stage('Static Code Analysis') {
-      environment {
-        SONAR_URL = "http://3.108.56.24:9000/"
-      }
           withSonarQubeEnv(credentialsId: 'Sonar-key') {
       steps {
           sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
