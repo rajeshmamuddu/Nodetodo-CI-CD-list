@@ -1,5 +1,8 @@
 pipeline{
     agent any
+    environment {
+        SONAR_HOME = "SONAR_HOME"
+    }
     stages{
         stage("Code Checkout"){
             steps{
@@ -9,11 +12,11 @@ pipeline{
         
       stage('Static Code Analysis') {
       environment {
-        SONAR_URL = "http://3.111.218.40:9000/"
+        SONAR_URL = "http://3.108.56.24:9000/"
       }
       steps {
         withCredentials([string(credentialsId: 'Sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
-          sh "$sonar_home/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
+          sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
         }
       }
     }
