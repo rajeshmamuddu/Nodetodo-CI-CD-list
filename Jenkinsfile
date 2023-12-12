@@ -36,12 +36,10 @@ pipeline{
         script {
             sh 'docker build -t ${DOCKER_IMAGE} .'
             def dockerImage = docker.image("${DOCKER_IMAGE}")
-            docker.withRegistry('https://index.docker.io', "Docker-cred") {
                 dockerImage.push()
             }
         }
       }
-    }   
         stage("Code Deploy"){
             steps{    
                 sh "docker-compose down && docker-compose up -d"
