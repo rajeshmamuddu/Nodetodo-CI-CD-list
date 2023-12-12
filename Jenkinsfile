@@ -1,8 +1,5 @@
 pipeline{
     agent any
-    environment{
-        SONAR_HOME= tool "sonar-scanner"
-    }
     stages{
         stage("Code Checkout"){
             steps{
@@ -10,14 +7,16 @@ pipeline{
             }
         }
         
-        stage("SonarQube Analysis"){
-            steps{
-                withSonarQubeEnv("Sonar-token"){
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
-                }
-            }
+      stage('Static Code Analysis') {
+      environment {
+        SONAR_URL = "http://3.108.56.24:9000/"
+      }
+      steps {
+        withCredentials([string(credentialsId: 'Sonar-token', variable: 'SONAR_AUTH_TOKEN')]) {
+          sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"'
         }
-        
+      }
+    }
         stage("SonarQube Quality Gates"){
                 steps{
                     timeout(time: 1, unit: "MINUTES"){
