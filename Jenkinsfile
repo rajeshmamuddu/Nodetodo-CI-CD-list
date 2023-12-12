@@ -1,39 +1,68 @@
-pipeline {
-    agent { label "dev-server"}
-    
-    stages {
+pipeline{
+    agent any
+    environment{
+        SONAR_HOME= tool "Sonar"
+    }
+    stages{
+        stage("Code Checkout"){
+            steps{
+                git url:"https://github.com/rajeshmamuddu/Nodetodo-CI-CD-list.git", branch:"main"
+            }
+        }
         
-        stage("code"){
+        stage("SonarQube Analysis"){
             steps{
-                git url: "https://github.com/LondheShubham153/node-todo-cicd.git", branch: "master"
-                echo 'bhaiyya code clone ho gaya'
-            }
-        }
-        stage("build and test"){
-            steps{
-                sh "docker build -t node-app-test-new ."
-                echo 'code build bhi ho gaya'
-            }
-        }
-        stage("scan image"){
-            steps{
-                echo 'image scanning ho gayi'
-            }
-        }
-        stage("push"){
-            steps{
-                withCredentials([usernamePassword(credentialsId:"dockerHub",passwordVariable:"dockerHubPass",usernameVariable:"dockerHubUser")]){
-                sh "docker login -u ${env.dockerHubUser} -p ${env.dockerHubPass}"
-                sh "docker tag node-app-test-new:latest ${env.dockerHubUser}/node-app-test-new:latest"
-                sh "docker push ${env.dockerHubUser}/node-app-test-new:latest"
-                echo 'image push ho gaya'
+                withSonarQubeEnv("sonar-cred"){
+                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
                 }
             }
         }
-        stage("deploy"){
+        
+        stage("SonarQube Quality Gates"){
+                steps{
+                    timeout(time: 1, unit: "MINUTES"){
+                        waitForQualityGate abortPipeline: false
+                    }
+                }
+        }
+        
+        stage("OWASP Dependency Check"){
             steps{
+                dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
+                dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+            }
+        }
+        
+        stage("Docker Code Build"){
+            steps{
+                sh "docker build -t nodeapp ."
+            }
+        }
+        
+        stage("Docker Code Scan: Trivy"){
+            steps{
+                sh "trivy image nodeapp"
+            }
+        }
+        stage('Build and Push Docker Image') {
+      environment {
+        DOCKER_IMAGE = "abhishekf5/nodeapp:latest"
+        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
+        REGISTRY_CREDENTIALS = credentials('docker-cred')
+      }
+      steps {
+        script {
+            sh 'cd java-maven-sonar-argocd-helm-k8s/spring-boot-app && docker build -t ${DOCKER_IMAGE} .'
+            def dockerImage = docker.image("${DOCKER_IMAGE}")
+            docker.withRegistry('https://index.docker.io/v1/', "docker-cred") {
+                dockerImage.push()
+            }
+        }
+      }
+    }   
+        stage("Code Deploy"){
+            steps{    
                 sh "docker-compose down && docker-compose up -d"
-                echo 'deployment ho gayi'
             }
         }
     }
