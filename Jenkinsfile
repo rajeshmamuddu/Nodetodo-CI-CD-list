@@ -14,8 +14,8 @@ pipeline{
       environment {
         SONAR_URL = "http://3.108.56.24:9000/"
       }
+          withSonarQubeEnv(credentialsId: 'Sonar-key') {
       steps {
-        withSonarQubeEnv(credentialsId: 'Sonar-key') {
           sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
         }
       }
