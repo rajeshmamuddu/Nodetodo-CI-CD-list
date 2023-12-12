@@ -8,29 +8,13 @@ pipeline{
             steps{
                 git url:"https://github.com/rajeshmamuddu/Nodetodo-CI-CD-list.git", branch:"main"
             }
-        }
-      stage('Static Code Analysis') {
-          withSonarQubeEnv(credentialsId: 'Sonar-key') {
-      steps {
-          sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
-        }
-      }
-    }
-        stage("SonarQube Quality Gates"){
-                steps{
-                    timeout(time: 1, unit: "MINUTES"){
-                        waitForQualityGate abortPipeline: false
-                    }
-                }
-        }
-        
+        } 
         stage("OWASP Dependency Check"){
             steps{
                 dependencyCheck additionalArguments: '--scan ./', odcInstallation: 'owasp'
                 dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
             }
         }
-        
         stage("Docker Code Build"){
             steps{
                 sh "docker build -t nodeapp ."
