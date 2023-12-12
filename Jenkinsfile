@@ -9,13 +9,17 @@ pipeline{
                 git url:"https://github.com/rajeshmamuddu/Nodetodo-CI-CD-list.git", branch:"main"
             }
         }
-        stage("SonarQube Analysis"){
-            steps{
-                withSonarQubeEnv("Sonar-Token"){
-                    sh "$SONAR_HOME/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
-                }
-            }
+        
+      stage('Static Code Analysis') {
+      environment {
+        SONAR_URL = "http://3.108.56.24:9000/"
+      }
+      steps {
+        withSonarQubeEnv(credentialsId: 'Sonar-key') {
+          sh "${SONAR_HOME}/bin/sonar-scanner -Dsonar.projectName=nodetodo -Dsonar.projectKey=nodetodo"
         }
+      }
+    }
         stage("SonarQube Quality Gates"){
                 steps{
                     timeout(time: 1, unit: "MINUTES"){
