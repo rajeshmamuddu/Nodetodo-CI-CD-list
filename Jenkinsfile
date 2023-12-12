@@ -30,7 +30,7 @@ pipeline{
       environment {
         DOCKER_IMAGE = "rajesh4851/nodeapp:latest"
         // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
-        REGISTRY_CREDENTIALS = credentials('docker-cred')
+        REGISTRY_CREDENTIALS = credentials('Docker-cred')
       }
       steps {
         script {
