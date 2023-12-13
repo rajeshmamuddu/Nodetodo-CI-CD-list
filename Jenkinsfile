@@ -35,11 +35,16 @@ pipeline{
       steps {
         script {
             sh 'docker build -t ${DOCKER_IMAGE} .'
-            def dockerImage = docker.image("${DOCKER_IMAGE}")
-                dockerImage.push()
+                }
+
+    withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
+        sh 'docker login -u rajesh4851 -p $PASSWORD'
+    }
+    stage("Push Image to Docker Hub"){
+        sh 'docker push rajesh4851/node-todo-list:latest'
+    }
             }
         }
-      }
         stage("Code Deploy"){
             steps{    
                 sh "docker-compose down && docker-compose up -d"
