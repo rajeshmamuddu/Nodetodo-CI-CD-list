@@ -32,8 +32,7 @@ pipeline{
         steps {
             withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
         script {
-               sh 'docker login -u rajesh4851 -p $PASSWORD'
-                  'docker push rajesh4851/node-todo-list:latest'
+                 sh 'docker push rajesh4851/node-todo-list:latest'
             
                 }
             }
