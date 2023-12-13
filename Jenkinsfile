@@ -32,8 +32,8 @@ pipeline{
         steps {
             withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
         script {
-                 sh 'docker push rajesh4851/nodeapp1:latest'
-            
+                 def dockerImage = docker.image("${DOCKER_IMAGE}")
+                dockerImage.push()
                 }
             }
         }
