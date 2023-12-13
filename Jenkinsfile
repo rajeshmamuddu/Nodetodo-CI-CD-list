@@ -28,14 +28,6 @@ pipeline{
                 sh "trivy image nodeapp1"
             }
         }    
-        // stage('Build and Push Docker Image') {
-        // steps {
-        //     withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
-        // script {
-        //          sh 'docker push rajesh4851/nodeapp:latest'
-        //         }
-        //     }
-        // }
         stage('Deploying into k8s'){
         steps{
           sh 'kubectl apply -f deployment.yml'
