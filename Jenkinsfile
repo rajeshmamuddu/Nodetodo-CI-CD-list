@@ -19,7 +19,6 @@ pipeline{
         stage("Docker Code Build"){
             steps{
                 sh "docker build -t nodeapp1 ."
-                sh 'docker push rajesh4851/nodeapp:latest'
             }
         }
         
