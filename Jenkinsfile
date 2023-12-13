@@ -26,14 +26,12 @@ pipeline{
             steps{
                 sh "trivy image nodeapp1"
             }
-        }
-        
+        }    
         stage('Build and Push Docker Image') {
         steps {
             withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
         script {
-                 def dockerImage = docker.image("${DOCKER_IMAGE}")
-                dockerImage.push()
+                 sh 'docker push rajesh4851/nodeapp:latest'
                 }
             }
         }
