@@ -2,6 +2,7 @@ pipeline{
     agent any
     environment {
         SONAR_HOME = "SONAR_HOME"
+        REGISTRY_CREDENTIALS = credentials('Docker-cred')
     }
     stages{
         stage("Code Checkout"){
@@ -26,23 +27,15 @@ pipeline{
                 sh "trivy image nodeapp"
             }
         }
+        
         stage('Build and Push Docker Image') {
-      environment {
-        DOCKER_IMAGE = "rajesh4851/nodeapp:latest"
-        // DOCKERFILE_LOCATION = "java-maven-sonar-argocd-helm-k8s/spring-boot-app/Dockerfile"
-        REGISTRY_CREDENTIALS = credentials('Docker-cred')
-      }
-      steps {
+        steps {
+            withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
         script {
-            sh 'docker build -t ${DOCKER_IMAGE} .'
+               sh 'docker login -u rajesh4851 -p $PASSWORD'
+                  'docker push rajesh4851/node-todo-list:latest'
+            
                 }
-
-    withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
-        sh 'docker login -u rajesh4851 -p $PASSWORD'
-    }
-    stage("Push Image to Docker Hub"){
-        sh 'docker push rajesh4851/node-todo-list:latest'
-    }
             }
         }
         stage("Code Deploy"){
@@ -51,4 +44,5 @@ pipeline{
             }
         }
     }
+}
 }
