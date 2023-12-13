@@ -19,6 +19,7 @@ pipeline{
         stage("Docker Code Build"){
             steps{
                 sh "docker build -t nodeapp1 ."
+                sh 'docker push rajesh4851/nodeapp:latest'
             }
         }
         
@@ -27,14 +28,14 @@ pipeline{
                 sh "trivy image nodeapp1"
             }
         }    
-        stage('Build and Push Docker Image') {
-        steps {
-            withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
-        script {
-                 sh 'docker push rajesh4851/nodeapp:latest'
-                }
-            }
-        }
+        // stage('Build and Push Docker Image') {
+        // steps {
+        //     withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
+        // script {
+        //          sh 'docker push rajesh4851/nodeapp:latest'
+        //         }
+        //     }
+        // }
         stage("Code Deploy"){
             steps{    
                 sh "docker-compose down && docker-compose up -d"
