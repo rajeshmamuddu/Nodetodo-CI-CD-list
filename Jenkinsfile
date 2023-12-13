@@ -18,13 +18,13 @@ pipeline{
         }
         stage("Docker Code Build"){
             steps{
-                sh "docker build -t nodeapp ."
+                sh "docker build -t nodeapp1 ."
             }
         }
         
         stage("Docker Code Scan: Trivy"){
             steps{
-                sh "trivy image nodeapp"
+                sh "trivy image nodeapp1"
             }
         }
         
@@ -32,7 +32,7 @@ pipeline{
         steps {
             withCredentials([string(credentialsId: 'Docker-cred', variable: 'PASSWORD')]) {
         script {
-                 sh 'docker push rajesh4851/node-todo-list:latest'
+                 sh 'docker push rajesh4851/nodeapp1:latest'
             
                 }
             }
